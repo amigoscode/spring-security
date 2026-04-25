@@ -47,7 +47,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(14);
     }
 
-    @Bean
+    // @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails amigoscode = User
                 .withUsername("amigoscode")

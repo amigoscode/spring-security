@@ -29,6 +29,19 @@ public class SecurityApplication {
 		return "bar";
 	}
 
+	@GetMapping("api/v1/me")
+	public Map<String, Object> me(Authentication authentication) {
+//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		return Map.of(
+				"authentication.isAuthenticated()", String.valueOf(authentication.isAuthenticated()),
+				"authentication.getAuthorities()", String.valueOf(authentication.getAuthorities()),
+				"authentication.getCredentials()", String.valueOf(authentication.getCredentials()),
+				"authentication.getPrincipal()", String.valueOf(authentication.getPrincipal()),
+				"authentication.getDetails()", String.valueOf(authentication.getDetails())
+		);
+	}
+
 	@Bean
 	CommandLineRunner commandLineRunner(
 			ApplicationUserRepository repository,
@@ -36,7 +49,6 @@ public class SecurityApplication {
 		return args -> {
 			ApplicationUser user = new ApplicationUser(
 					"amigoscode", passwordEncoder.encode("password"), Set.of("USER"));
-			user.setAccountLocked(true);
 			repository.save(user);
 		};
 	}

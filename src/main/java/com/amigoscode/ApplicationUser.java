@@ -20,13 +20,13 @@ public class ApplicationUser {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, name = "role")
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
             name = "app_user_role",
-            joinColumns = @JoinColumn(name = "application_user_id")
+            joinColumns = @JoinColumn(name = "application_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<String> appUserRoles = new HashSet<>();
+    private Set<Role> appUserRoles = new HashSet<>();
 
     @Column(nullable = false)
     private boolean isEnabled = true;
@@ -39,11 +39,11 @@ public class ApplicationUser {
 
     @Column(nullable = false)
     private boolean isCredentialsExpired = false;
-    
+
     public ApplicationUser() {
     }
 
-    public ApplicationUser(String username, String password, Set<String> appUserRoles) {
+    public ApplicationUser(String username, String password, Set<Role> appUserRoles) {
         this.username = username;
         this.password = password;
         this.appUserRoles = appUserRoles;
@@ -73,11 +73,11 @@ public class ApplicationUser {
         this.password = password;
     }
 
-    public Set<String> getAppUserRoles() {
+    public Set<Role> getAppUserRoles() {
         return appUserRoles;
     }
 
-    public void setAppUserRoles(Set<String> appUserRoles) {
+    public void setAppUserRoles(Set<Role> appUserRoles) {
         this.appUserRoles = appUserRoles;
     }
 
@@ -112,6 +112,7 @@ public class ApplicationUser {
     public void setCredentialsExpired(boolean credentialsExpired) {
         isCredentialsExpired = credentialsExpired;
     }
+
 
     @Override
     public boolean equals(Object o) {

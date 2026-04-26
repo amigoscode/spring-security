@@ -6,12 +6,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,12 +47,42 @@ public class SecurityApplication {
 
 	@Bean
 	CommandLineRunner commandLineRunner(
-			ApplicationUserRepository repository,
+			ApplicationUserRepository applicationUserRepository,
+			RoleRepository roleRepository,
+			PermissionRepository permissionRepository,
 			PasswordEncoder passwordEncoder) {
 		return args -> {
-			ApplicationUser user = new ApplicationUser(
-					"amigoscode", passwordEncoder.encode("password"), Set.of("USER"));
-			repository.save(user);
+			Permission userRead = permissionRepository.save(new Permission("user:read"));
+			Permission userDelete = permissionRepository.save(new Permission("user:delete"));
+			Permission userUpdate = permissionRepository.save(new Permission("user:update"));
+
+			Role adminRole = roleRepository.save(
+					new Role(
+						"ADMIN",
+						Set.of(userRead, userDelete, userUpdate)
+					)
+			);
+
+			Role managerRole = roleRepository.save(
+					new Role(
+							"MANAGER",
+							Set.of(userRead, userUpdate)
+					)
+			);
+
+			ApplicationUser amigoscode = new ApplicationUser(
+					"amigoscode",
+					passwordEncoder.encode("password"),
+					Set.of(adminRole)
+			);
+
+			ApplicationUser thays = new ApplicationUser(
+					"thays",
+					passwordEncoder.encode("password"),
+					Set.of(managerRole)
+			);
+
+			applicationUserRepository.saveAll(List.of(amigoscode, thays));
 		};
 	}
 

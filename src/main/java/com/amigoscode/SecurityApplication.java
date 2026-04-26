@@ -70,6 +70,13 @@ public class SecurityApplication {
 					)
 			);
 
+
+			Role userRole = roleRepository.save(
+					new Role(
+							"USER"
+					)
+			);
+
 			ApplicationUser amigoscode = new ApplicationUser(
 					"amigoscode",
 					passwordEncoder.encode("password"),
@@ -82,7 +89,14 @@ public class SecurityApplication {
 					Set.of(managerRole)
 			);
 
-			applicationUserRepository.saveAll(List.of(amigoscode, thays));
+			ApplicationUser ollayor = new ApplicationUser(
+					"ollayor",
+					passwordEncoder.encode("password"),
+					Set.of(userRole)
+			);
+
+
+			applicationUserRepository.saveAll(List.of(amigoscode, thays, ollayor));
 		};
 	}
 

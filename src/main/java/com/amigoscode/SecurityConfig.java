@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers(
-                                        "/api/v*/auth/**", "api/v*/public/**"
+                                        "/api/v*/auth/**", "/api/v*/public/**"
                                 ).permitAll()
                                 .requestMatchers(HttpMethod.DELETE, "/api/v*/management/**").hasAuthority("user:delete")
                                 .requestMatchers("/api/v*/management/**").hasAnyRole("ADMIN", "MANAGER")

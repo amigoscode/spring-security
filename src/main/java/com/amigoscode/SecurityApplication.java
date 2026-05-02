@@ -1,16 +1,15 @@
 package com.amigoscode;
 
+import com.amigoscode.auth.JwtTokenService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,12 +46,26 @@ public class SecurityApplication {
 		);
 	}
 
+	@GetMapping("api/v2/me")
+	public Map<String, Object> me2(@AuthenticationPrincipal Jwt jwt) {
+
+		return Map.of(
+				"subject", jwt.getSubject(),
+				"issuer", jwt.getIssuer(),
+				"issuedAt", jwt.getIssuedAt(),
+				"expiresAt", jwt.getExpiresAt(),
+				"roles", jwt.getClaimAsStringList("roles"),
+				"permissions", jwt.getClaimAsStringList("permissions")
+		);
+	}
+
 	@Bean
 	CommandLineRunner commandLineRunner(
 			ApplicationUserRepository applicationUserRepository,
 			RoleRepository roleRepository,
 			PermissionRepository permissionRepository,
-			PasswordEncoder passwordEncoder) {
+			PasswordEncoder passwordEncoder,
+			JwtTokenService jwtTokenService) {
 		return args -> {
 			Permission userRead = permissionRepository.save(new Permission("user:read"));
 			Permission userDelete = permissionRepository.save(new Permission("user:delete"));

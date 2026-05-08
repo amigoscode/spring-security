@@ -10,8 +10,11 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 @Service
 public class JwtTokenService {
@@ -21,15 +24,17 @@ public class JwtTokenService {
         this.jwtEncoder = jwtEncoder;
     }
 
-    String generateToken(Authentication authentication) {
+    String generateToken(
+            String subject,
+            Collection<? extends GrantedAuthority> authorities
+    ) {
         Instant now = Instant.now();
-        var authorities = authentication.getAuthorities();
         var roles = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(r -> r.startsWith("ROLE_"))
                 .map(r -> r.substring("ROLE_".length()))
                 .toList();
-        var permisions = authorities.stream()
+        var permissions = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .filter(authority -> !authority.startsWith("ROLE_") && !authority.startsWith("FACTOR_"))
                 .toList();
@@ -37,10 +42,10 @@ public class JwtTokenService {
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuer("https://amigoscode.com")
                 .issuedAt(now)
-                .expiresAt(now.plus(15, MINUTES))
-                .subject(authentication.getName())
+                .expiresAt(now.plus(30, SECONDS))
+                .subject(subject)
                 .claim("roles", roles)
-                .claim("permissions", permisions)
+                .claim("permissions", permissions)
                 .build();
         JwsHeader jwsHeader = JwsHeader.with(MacAlgorithm.HS256).build();
         JwtEncoderParameters jwtEncoderParameters = JwtEncoderParameters.from(

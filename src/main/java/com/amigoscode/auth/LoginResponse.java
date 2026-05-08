@@ -1,6 +1,7 @@
 package com.amigoscode.auth;
 
 public record LoginResponse(
-        String token
+        String accessToken,
+        String refreshToken
 ) {
 }

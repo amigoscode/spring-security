@@ -27,16 +27,13 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
     private final RefreshTokenService refreshTokenService;
-    private final ApplicationUserRepository applicationUserRepository;
 
     public AuthController(AuthenticationManager authenticationManager,
                           JwtTokenService jwtTokenService,
-                          RefreshTokenService refreshTokenService,
-                          ApplicationUserRepository applicationUserRepository) {
+                          RefreshTokenService refreshTokenService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenService = jwtTokenService;
         this.refreshTokenService = refreshTokenService;
-        this.applicationUserRepository = applicationUserRepository;
     }
 
     @PostMapping("login")

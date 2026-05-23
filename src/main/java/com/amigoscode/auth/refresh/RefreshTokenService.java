@@ -70,4 +70,22 @@ public class RefreshTokenService {
         ApplicationUser applicationUser = currentRefreshToken.getApplicationUser();
         return generateRefreshToken(applicationUser);
     }
+
+    @Transactional
+    public void revokeRefreshToken(String token) {
+        RefreshToken currentRefreshToken = refreshTokenRepository
+                .findByToken(token)
+                .orElseThrow(() -> new BadCredentialsException("Invalid refresh token"));
+
+        if(currentRefreshToken.isRevoked()) {
+            throw new BadCredentialsException("Refresh token is revoked");
+        }
+
+        if(currentRefreshToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new BadCredentialsException("Refresh token is expired");
+        }
+
+        currentRefreshToken.setRevoked(true);
+        refreshTokenRepository.save(currentRefreshToken);
+    }
 }
